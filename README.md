@@ -7,8 +7,10 @@ Successfully tested on checkmk RAW version 1.6.0 (stable)
 
 Path
 ----
+```
 - Place this into /omd/sites/<SITE>/local/bin/
 - Make this script executable!
+```
 
 Configure
 ---------
