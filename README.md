@@ -20,5 +20,5 @@ check_speedport_hybrid.py --host $HOSTADDRESS$
 
 Local network http links without authentication
 -----------------------------------------------
-HTML: http://<speedport-address>/html/login/status.html?lang=en
-JSON: http://<speedport-address>/data/Status.json
+- HTML: http://<speedport-address>/html/login/status.html?lang=en
+- JSON: http://<speedport-address>/data/Status.json
