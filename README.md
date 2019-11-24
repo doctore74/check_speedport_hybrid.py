@@ -2,7 +2,7 @@
 checkmk datasource program for speedport hybrid.
 
 checkmk
-https://mathias-kettner.com/
+https://checkmk.com/
 Successfully tested on checkmk RAW version 1.6.0 (stable)
 
 Path
