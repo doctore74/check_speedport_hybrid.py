@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 
 # Christian Wirtz <doc@snowheaven.de>
+# Github: @doctore74
 #
-# Check_MK datasource program for Telekom Speedport hybrid 
+# checkmk datasource program for Telekom Speedport hybrid 
 # Firmware-Version 050124.04.00.005
 #
 # Output will be printed in <<<local>>> section.
@@ -24,9 +25,9 @@
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #######################################################################
 
-# Check_MK
+# checkmk
 # https://mathias-kettner.com/
-# Successfully tested on Check_MK RAW version 1.5.0 (stable)
+# Successfully tested on checkmk RAW version 1.6.0 (stable)
 # 
 # Path:
 # Place this into /omd/sites/<SITE>/local/bin/
@@ -37,8 +38,8 @@
 # check_speedport_hybrid.py --host $HOSTADDRESS$
 #
 # Local network http links without authentication
-# HTML: http://192.168.2.1/html/login/status.html?lang=en
-# JSON: http://192.168.2.1/data/Status.json
+# HTML: http://<speedport-address>/html/login/status.html?lang=en
+# JSON: http://<speedport-address>/data/Status.json
 #
 # Changelog
 
@@ -149,12 +150,11 @@ print "AgentOS: Linux"
 print "<<<local>>>"
 
 num_phones = 0
+serviceprefix = "status_"
+
 
 # Parse JSON info
 for info in output:
-    serviceprefix = "status_"
-    #print "varid: %s" % info['varid'] 
-    
     if(str(info['varvalue']).isdigit()) :
         perf = "value=" + info['varvalue']
     else:
@@ -164,54 +164,17 @@ for info in output:
         info['varvalue'] = "null"
 
     if "addphonenumber" == str(info['varid']):
-        #print "-----------------"
-        #print (info['varvalue'])
-        #print "-----------------"
-        #print "0"
-        #print (info['varvalue'][0])
-        #print "1"
-        #print (info['varvalue'][1])
-        #print "2"
-        #print (info['varvalue'][2])
-        #print "3"
-        #print (info['varvalue'][3])
-        #print "4"
-        #print (info['varvalue'][4])
-        #
-        #print "-----------------"
-        #print "Phone number"
-        #print (info['varvalue'][1]['varvalue'])
         ph_phone_num = info['varvalue'][1]['varvalue']
-        #print "failreason"
-        #print (info['varvalue'][2]['varvalue'])
         ph_failreason = info['varvalue'][2]['varvalue']
-        #print "status"
-        #print (info['varvalue'][3]['varvalue'])
         ph_status = info['varvalue'][3]['varvalue']
-        #print "voip_errno"
-        #print (info['varvalue'][4]['varvalue'])
         ph_voip_errno = info['varvalue'][4]['varvalue']
-        #print "-----------------"
-
         print "0 %s %s %s" % (serviceprefix + "Phone_number_" + ph_phone_num,
                               "-",
                               "Status: " + ph_status + ", "
                               "Failreason: " + ph_failreason + ", "
                               "VOIP ErrNo: " + ph_voip_errno
                              )
-
     elif "adddect" == str(info['varid']):
-        #print "-----------------"
-        #print (info['varvalue'])
-        ## [{u'varid': u'id', u'varvalue': u'2', u'vartype': u'value'}]
-        #print "-----------------"
-        #print (info['varvalue'][0])
-        ## {u'varid': u'id', u'varvalue': u'2', u'vartype': u'value'}
-        #print "-----------------"
-        #print (info['varvalue'][0]['varvalue'])
-        ## 2
-        #print "-----------------"
-
         if num_phones < int(info['varvalue'][0]['varvalue']):
             num_phones = int(info['varvalue'][0]['varvalue'])
     else:
@@ -220,90 +183,5 @@ for info in output:
 
 print "0 %s %s %s" % (serviceprefix + "Registered_cordless_telephones", "phones=" + str(num_phones), num_phones)
 
-
-
-# Build href for links service
-#links = "<a href='%s' target='_blank'>Luftdaten</a> <a href='%s' target='_blank'>Opensenemap</a> <a href='%s' target='_blank'>Local</a>" % (fd_url, osm_url, local_url)
-#print "0 Links - %s" % (links)
-
-# Build measurement outputs
-#print "0 Age - %s sec" % (output['age'])
-#print "0 Software_Version - %s" % (output['software_version'])
-#
-#for dict_line in output['sensordatavalues']:
-#  # map units
-#  unit = ''
-#  units = {'SDS_P2'             : 'ug/m3',         # SDS011 PM2.5
-#           'SDS_P1'             : 'ug/m3',         # SDS011 PM10
-#           'BME280_temperature' : 'C',             # BME280 Temperatur
-#           'BME280_humidity'    : '%',             # BME280 rel. Luftfeuchte
-#           'BME280_pressure'    : 'hPa',           # BME280 Luftdruck
-#           'samples'            : '',              # ???
-#           'min_micro'          : '',              # ???
-#           'max_micro'          : '',              # ???
-#           'temperature'        : 'C',             # DHT22 Temperatur
-#           'humidity'           : '%',             # DHT22 rel. Luftfeuchte
-#           'signal'             : 'dBm',           # WIFI Signal
-#          }
-#  unit = units.get(dict_line['value_type'], '')
-#
-#  # map perflabels
-#  perflabel = ''
-#  perflabels = {'SDS_P2'             : 'finedust',    # SDS011 PM2.5
-#		'SDS_P1'             : 'finedust',    # SDS011 PM10
-#		'BME280_temperature' : 'temp',        # BME280 Temperatur
-#		'BME280_humidity'    : 'humidity',    # BME280 rel. Luftfeuchte
-#		'BME280_pressure'    : 'airpressure', # BME280 Luftdruck
-#		'samples'            : 'samples',     # ???
-#		'min_micro'          : 'min_micro',   # ???
-#		'max_micro'          : 'max_micro',   # ???
-#		'temperature'        : 'temp',        # DHT22 Temperatur
-#		'humidity'           : 'humidity',    # DHT22 rel. Luftfeuchte
-#		'signal'             : 'signal',      # WIFI Signal
-#	       }
-#  perflabel = perflabels.get(dict_line['value_type'], 'value')
-#
-#  # map infotext
-#  infotext = ''
-#  infotexts = {'SDS_P2'             : 'finedust PM2.5 concentration', # SDS011 PM2.5
-#               'SDS_P1'             : 'finedust PM10 concentration',  # SDS011 PM10
-#               'BME280_temperature' : 'temp',        # BME280 Temperatur
-#               'BME280_humidity'    : 'humidity',    # BME280 rel. Luftfeuchte
-#               'BME280_pressure'    : 'airpressure', # BME280 Luftdruck
-#               'samples'            : 'samples',     # ???
-#               'min_micro'          : 'min_micro',   # ???
-#               'max_micro'          : 'max_micro',   # ???
-#               'temperature'        : 'temp',        # DHT22 Temperatur
-#               'humidity'           : 'humidity',    # DHT22 rel. Luftfeuchte
-#               'signal'             : 'signal',      # WIFI Signal
-#             }
-#  infotext = infotexts.get(dict_line['value_type'], '')
-#
-#  # map warnings
-#  warn = ''
-#  warnings = {'SDS_P2'             : ';50', # SDS011 PM10
-#              'SDS_P1'             : ';50', # SDS011 PM2.5
-#              'BME280_temperature' : '',    # BME280 Temperatur
-#              'BME280_humidity'    : '',    # BME280 rel. Luftfeuchte
-#              'BME280_pressure'    : '',    # BME280 Luftdruck
-#              'samples'            : '',    # ???
-#              'min_micro'          : '',    # ???
-#              'max_micro'          : '',    # ???
-#              'temperature'        : '',    # DHT22 Temperatur
-#              'humidity'           : '',    # DHT22 rel. Luftfeuchte
-#              'signal'             : '',    # WIFI Signal
-#             }
-#  warn = warnings.get(dict_line['value_type'], '')
-#
-#  # Build measurement outputs
-#  print "P %s %s=%s%s %s %s %s" % (
-#					  dict_line['value_type'],
-#					  perflabel,
-#					  dict_line['value'],
-#					  warn,
-#					  dict_line['value'],
-#					  unit,
-#					  infotext,
-#				         )
-#
 print "<<<>>>"
+
